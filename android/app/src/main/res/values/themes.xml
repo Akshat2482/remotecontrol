@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.JarvisRemote" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#00B8D4</item>
+        <item name="colorPrimaryDark">#006064</item>
+        <item name="colorAccent">#00E5FF</item>
+        <item name="android:windowBackground">#0A0E14</item>
+    </style>
+</resources>
