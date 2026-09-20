@@ -383,8 +383,8 @@ WHATSAPP_PHONE = "919962919450"
 
 def _notify_whatsapp(text: str) -> None:
     """Open WhatsApp Web with a pre-filled message to WHATSAPP_PHONE and
-    auto-send it. Tries Ctrl+Enter first (WhatsApp's send shortcut); if the
-    page hasn't finished loading yet, waits longer and retries."""
+    auto-send it. Waits for the page to load, clicks in the message input
+    area to focus it, then presses Enter to send."""
     try:
         import urllib.parse
         import time
@@ -393,11 +393,17 @@ def _notify_whatsapp(text: str) -> None:
         url = f"https://web.whatsapp.com/send?phone={WHATSAPP_PHONE}&text={encoded}"
         os.startfile(url)  # Windows
 
-        # WhatsApp Web needs time to load, focus the chat box, and put the
-        # cursor in the message field. Ctrl+Enter is WhatsApp's send shortcut
-        # (plain Enter just inserts a newline while drafting).
-        time.sleep(4)
-        pyautogui.hotkey("ctrl", "enter")
+        # Give WhatsApp Web time to load and render the chat + input box.
+        time.sleep(5)
+
+        # Click near the bottom-center of the screen to focus the message
+        # input field (WhatsApp's input box is always at the bottom).
+        screen_w, screen_h = pyautogui.size()
+        pyautogui.click(screen_w // 2, screen_h - 80)
+
+        # Small pause to let the input field register focus, then send.
+        time.sleep(0.5)
+        pyautogui.press("enter")
     except Exception as e:
         print(f"[notify] couldn't auto-send WhatsApp: {e}")
 
