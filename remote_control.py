@@ -382,15 +382,22 @@ WHATSAPP_PHONE = "919962919450"
 
 
 def _notify_whatsapp(text: str) -> None:
-    """Open WhatsApp Web in the default browser with a pre-filled message
-    to WHATSAPP_PHONE. The user just needs to hit Enter or tap Send."""
+    """Open WhatsApp Web with a pre-filled message to WHATSAPP_PHONE and
+    auto-send it by simulating Enter after the page loads."""
     try:
         import urllib.parse
+        import time
+
         encoded = urllib.parse.quote(text)
         url = f"https://web.whatsapp.com/send?phone={WHATSAPP_PHONE}&text={encoded}"
         os.startfile(url)  # Windows
+
+        # Give WhatsApp Web time to load, focus the chat, and put the
+        # cursor in the message box. Then press Enter to send.
+        time.sleep(3)
+        pyautogui.press("enter")
     except Exception as e:
-        print(f"[notify] couldn't open WhatsApp Web: {e}")
+        print(f"[notify] couldn't auto-send WhatsApp: {e}")
 
 
 def start_remote_control() -> None:
