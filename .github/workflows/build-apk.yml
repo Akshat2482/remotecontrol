@@ -28,10 +28,13 @@ jobs:
         run: |
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
           echo "ANDROID_HOME=$ANDROID_HOME"
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
           sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Accept SDK licenses
-        run: yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses || true
+        run: |
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses || true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
