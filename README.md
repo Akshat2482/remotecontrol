@@ -30,13 +30,17 @@ dictate mode always does.
    ```bash
    pip install -r pc/requirements-remote.txt
    ```
-2. Install `cloudflared` (free, no Cloudflare account needed for this):
-   - Windows: `winget install --id Cloudflare.cloudflared`
-   - or download directly: https://github.com/cloudflare/cloudflared/releases
-   - Make sure it's on your PATH (test with `cloudflared --version` in a
-     new terminal).
-3. Copy `pc/remote_control.py` next to your `Jarvis.py`.
-4. Wire the wake phrase into your existing voice mode — in
+2. Install `ngrok` (free tier, no credit card needed for this):
+   - Download: https://ngrok.com/download
+   - Or Windows: `winget install --id ngrok.ngrok`
+   - Make sure it's on your PATH (test with `ngrok --version` in a new terminal).
+3. **One-time ngrok auth** (run once, keeps your URL stable across restarts):
+   ```bash
+   ngrok authtoken <YOUR_AUTH_TOKEN>
+   ```
+   Get a free token at https://dashboard.ngrok.com/get-started/your-authtoken (sign up is free, no card required).
+4. Copy `pc/remote_control.py` next to your `Jarvis.py`.
+5. Wire the wake phrase into your existing voice mode — in
    `voice_mode.py`, wherever you currently handle a finished transcript:
 
    ```python
@@ -48,12 +52,12 @@ dictate mode always does.
        ...your existing command handling...
    ```
 
-5. **Wire in your real command handling.** `remote_control.py` ships with a
+6. **Wire in your real command handling.** `remote_control.py` ships with a
    placeholder `process_command()` that only understands "open chrome" and
    "open notepad" so you can test the pipe end-to-end. Replace it with a
    call into your actual Jarvis command/LLM pipeline — see the comment
    block at the top of the file for exactly where.
-6. Same for `speak()` — it tries to import your existing `tts_engine`
+7. Same for `speak()` — it tries to import your existing `tts_engine`
    module first, and only falls back to bare `pyttsx3` if that's not
    found. If your TTS module has a different function name/signature,
    adjust the import in `speak()`.
@@ -85,10 +89,10 @@ You don't need Android Studio. GitHub builds it for you:
 
 1. Say the activation phrase to Jarvis. It'll print (and speak) something
    like:
-   > Remote control protocol active. Server: wss://random-words.trycloudflare.com. Token: aB3x...
+   > Remote control protocol active. Server: https://abc123.ngrok.io. Token: aB3x...
 
-2. Open the app, paste the `wss://...` URL and the token into the connect
-   screen, tap **Connect**.
+2. Open the app, paste the `https://...` URL (replace https with wss) and
+   the token into the connect screen, tap **Connect**.
 3. Bottom pane shows your screen — tap to click, drag to drag.
 4. Top pane: type a message and hit send, or tap the mic and talk.
 
@@ -96,13 +100,13 @@ You don't need Android Studio. GitHub builds it for you:
 
 Anyone with your tunnel URL *and* token can control your PC. The token is
 regenerated randomly every time the server starts and only shown to you —
-treat it like a password and don't share it. Cloudflare's free "quick
-tunnel" URLs are also random and expire when the tunnel process stops, so
-between the token and the URL there are two things an attacker would need
-simultaneously, but this is still meaningfully less locked-down than, say,
-a VPN. Don't leave the remote control protocol running unattended for long
-stretches if that concerns you — it's designed to be started on demand by
-voice, not left on permanently.
+treat it like a password and don't share it. Ngrok's free tier URLs are
+random and expire after 2 hours of inactivity, so between the token and
+the URL there are two things an attacker would need simultaneously, but
+this is still meaningfully less locked-down than, say, a VPN. Don't leave
+the remote control protocol running unattended for long stretches if that
+concerns you — it's designed to be started on demand by voice, not left on
+permanently.
 
 ## Known limitations / where to go from here
 
@@ -116,7 +120,8 @@ voice, not left on permanently.
 - **One phone at a time**: input handling assumes a single controlling
   connection. Multiple phones can technically connect and will all see
   the screen stream, but their taps/drags will collide.
-- **Tunnel URL changes every restart** (Cloudflare's free quick tunnels
-  are ephemeral). If you want a stable, unchanging URL, that requires a
-  free Cloudflare account and a *named* tunnel instead — a reasonable v2
-  upgrade if the copy-paste-a-new-URL-each-time flow gets old.
+- **Tunnel URL changes** (ngrok free tier: random URL, expires after 2h
+  inactivity). If you want a stable, unchanging URL, that requires a paid
+  ngrok plan or a Cloudflare account with a *named* tunnel — see
+  `_start_ngrok_tunnel()` / `_start_cloudflare_tunnel()` in
+  `remote_control.py` to switch back.
