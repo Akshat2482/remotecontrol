@@ -382,30 +382,15 @@ WHATSAPP_PHONE = "919962919450"
 
 
 def _notify_whatsapp(text: str) -> None:
-    """Open WhatsApp Web with a pre-filled message to WHATSAPP_PHONE and
-    auto-send it. Waits for the page to load, clicks in the message input
-    area to focus it, then presses Enter to send."""
+    """Open WhatsApp Web with a pre-filled message to WHATSAPP_PHONE.
+    The user manually hits Enter or taps Send."""
     try:
         import urllib.parse
-        import time
-
         encoded = urllib.parse.quote(text)
         url = f"https://web.whatsapp.com/send?phone={WHATSAPP_PHONE}&text={encoded}"
         os.startfile(url)  # Windows
-
-        # Give WhatsApp Web time to load and render the chat + input box.
-        time.sleep(5)
-
-        # Click near the bottom-center of the screen to focus the message
-        # input field (WhatsApp's input box is always at the bottom).
-        screen_w, screen_h = pyautogui.size()
-        pyautogui.click(screen_w // 2, screen_h - 80)
-
-        # Small pause to let the input field register focus, then send.
-        time.sleep(0.5)
-        pyautogui.press("enter")
     except Exception as e:
-        print(f"[notify] couldn't auto-send WhatsApp: {e}")
+        print(f"[notify] couldn't open WhatsApp Web: {e}")
 
 
 def start_remote_control() -> None:
@@ -436,18 +421,15 @@ def start_remote_control() -> None:
     if tunnel_url:
         ws_url = tunnel_url.replace("https://", "wss://")
         message = (
-            "JARVIS: Remote control protocol active.\n\n"
-            f"Server: {ws_url}\n\n"
-            f"Token: {AUTH_TOKEN}\n\n"
-            "Enter both in the app's connect screen."
+            f"JARVIS: Remote control protocol active. "
+            f"Server: {ws_url}. Token: {AUTH_TOKEN}. "
+            f"Enter both in the app's connect screen."
         )
     else:
         message = (
-            "JARVIS: Remote control server started locally on port "
-            f"{WS_PORT}, but the public tunnel didn't come up — check that "
-            f"cloudflared is installed.\n\n"
-            f"Token: {AUTH_TOKEN}\n\n"
-            "Enter the token in the app's connect screen."
+            f"JARVIS: Remote control server started locally on port {WS_PORT}, "
+            f"but the public tunnel didn't come up — check that cloudflared "
+            f"is installed. Token: {AUTH_TOKEN}."
         )
 
     print(f"[remote_control] {message}")
