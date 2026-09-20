@@ -436,15 +436,18 @@ def start_remote_control() -> None:
     if tunnel_url:
         ws_url = tunnel_url.replace("https://", "wss://")
         message = (
-            f"JARVIS: Remote control protocol active. "
-            f"Server: {ws_url}. Token: {AUTH_TOKEN}. "
-            f"Enter both in the app's connect screen."
+            "JARVIS: Remote control protocol active.\n\n"
+            f"Server: {ws_url}\n\n"
+            f"Token: {AUTH_TOKEN}\n\n"
+            "Enter both in the app's connect screen."
         )
     else:
         message = (
-            f"JARVIS: Remote control server started locally on port {WS_PORT}, "
-            f"but the public tunnel didn't come up — check that cloudflared "
-            f"is installed. Token: {AUTH_TOKEN}."
+            "JARVIS: Remote control server started locally on port "
+            f"{WS_PORT}, but the public tunnel didn't come up — check that "
+            f"cloudflared is installed.\n\n"
+            f"Token: {AUTH_TOKEN}\n\n"
+            "Enter the token in the app's connect screen."
         )
 
     print(f"[remote_control] {message}")
