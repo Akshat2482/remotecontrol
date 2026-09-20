@@ -375,6 +375,24 @@ def _start_tunnel(port: int) -> str | None:
 # 7) Start / stop
 # ============================================================
 
+# Your phone number in international format (without + or spaces) —
+# WhatsApp Web will open in the default browser with a pre-filled message
+# to this number. Change this to your own number.
+WHATSAPP_PHONE = "919962919450"
+
+
+def _notify_whatsapp(text: str) -> None:
+    """Open WhatsApp Web in the default browser with a pre-filled message
+    to WHATSAPP_PHONE. The user just needs to hit Enter or tap Send."""
+    try:
+        import urllib.parse
+        encoded = urllib.parse.quote(text)
+        url = f"https://web.whatsapp.com/send?phone={WHATSAPP_PHONE}&text={encoded}"
+        os.startfile(url)  # Windows
+    except Exception as e:
+        print(f"[notify] couldn't open WhatsApp Web: {e}")
+
+
 def start_remote_control() -> None:
     global _running, _server_thread, _server_loop
     if _running:
@@ -416,6 +434,7 @@ def start_remote_control() -> None:
 
     print(f"[remote_control] {message}")
     speak(message)
+    _notify_whatsapp(message)
 
 
 def stop_remote_control() -> None:
